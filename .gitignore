@@ -1,2 +1,3 @@
 .env
 .cli_config.json
+cacert.pem
