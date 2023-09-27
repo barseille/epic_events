@@ -6,6 +6,12 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = '__all__'
 
+    def validate_role(self, value):
+        if not value:
+            raise serializers.ValidationError("Le champ rôle est obligatoire.")
+        return value
+
+
 class ClientSerializer(serializers.ModelSerializer):
     class Meta:
         model = Client
