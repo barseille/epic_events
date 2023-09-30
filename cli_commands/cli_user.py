@@ -92,3 +92,4 @@ def add_user(username: str, email: str, password: str, role: str):
 #         typer.echo(f"{role} {username} créé avec succès!")
 #     except Exception as e:
 #         typer.echo(f"Erreur lors de la création : {e}")
+

@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from .models import Client, Contrat, Event , User 
+from .models import Client, Contrat, Event ,User 
 from .serializers import ClientSerializer, ContratSerializer, EventSerializer, UserSerializer
 from .permissions import IsCommercial, IsAdministration, IsSupport
 from django.contrib.auth import get_user_model
@@ -58,7 +58,7 @@ class ClientViewSet(viewsets.ModelViewSet):
         elif self.action == 'delete':
             self.permission_classes = [IsAuthenticated, IsCommercial]
         return [permission() for permission in self.permission_classes]
-    
+
 class ContratViewSet(viewsets.ModelViewSet):
     """
     Un ViewSet pour gérer les opérations CRUD sur les objets 'Contrat'.
@@ -75,12 +75,14 @@ class ContratViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             self.permission_classes = [IsAuthenticated, IsAdministration]
         elif self.action == 'create':
-            self.permission_classes = [IsAuthenticated, IsCommercial]
+            self.permission_classes = [IsAuthenticated, IsAdministration]
         elif self.action in ['update', 'partial_update']:
             self.permission_classes = [IsAuthenticated, IsAdministration]
         elif self.action == 'delete':
             self.permission_classes = [IsAuthenticated, IsAdministration]
         return [permission() for permission in self.permission_classes]
+
+
 
 class EventViewSet(viewsets.ModelViewSet):
     """
@@ -89,7 +91,7 @@ class EventViewSet(viewsets.ModelViewSet):
     """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
-    
+
     def get_permissions(self):
         """
         Définit les permissions en fonction de l'action effectuée.
@@ -103,3 +105,32 @@ class EventViewSet(viewsets.ModelViewSet):
         elif self.action == 'delete':
             self.permission_classes = [IsAuthenticated, IsSupport]
         return [permission() for permission in self.permission_classes]
+
+    
+    def create(self, request, *args, **kwargs):
+        # Récupérer l'ID du contrat depuis les données de la requête
+        contrat_id = request.data.get('contrat')
+
+        # Vérifier si un événement pour ce contrat existe déjà
+        existing_event = Event.objects.filter(contrat_id=contrat_id).first()
+        if existing_event:
+            return Response({"error": "Un événement pour ce contrat existe déjà."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Vérifier si le contrat existe et est signé
+        try:
+            contrat = Contrat.objects.get(id=contrat_id)
+            
+            # Vérifier si le contrat est signé
+            if not contrat.is_signed:
+                return Response({"error": "Le contrat doit être signé avant de créer un événement."}, status=status.HTTP_400_BAD_REQUEST)
+            
+            # Nouvelle condition : Vérifier si le paiement a été reçu
+            if contrat.payment_received != 'OUI':
+                return Response({"error": "Le paiement doit être reçu avant de créer un événement."}, status=status.HTTP_400_BAD_REQUEST)
+                
+        except Contrat.DoesNotExist:
+            return Response({"error": "Contrat non trouvé."}, status=status.HTTP_400_BAD_REQUEST)
+
+        # Si tout est bon, procéder à la création de l'événement
+        return super(EventViewSet, self).create(request, *args, **kwargs)
+

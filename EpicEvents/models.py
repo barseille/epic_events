@@ -1,6 +1,11 @@
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
+# signal fourni par Django qui est envoyé juste après qu'un objet modèle est sauvegardé
+from django.db.models.signals import post_save
+# décorateur qui permet de connecter une fonction à un signal
+from django.dispatch import receiver
+
 
 # Liste des rôles utilisateur disponibles.
 USER_ROLES = [
@@ -51,3 +56,14 @@ class Event(models.Model):
     end_date = models.DateField()
     attendees = models.IntegerField()
     notes = models.TextField(null=True, blank=True)
+    
+@receiver(post_save, sender=Event)
+def update_contract_status(sender, instance, **kwargs):
+    end_date = instance.end_date
+    today = timezone.now().date()
+
+    if end_date < today:
+        contrat = instance.contrat
+        contrat.status = 'TERMINE'
+        contrat.save()
+
