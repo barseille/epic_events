@@ -5,6 +5,7 @@ from django.utils import timezone
 from django.db.models.signals import post_save
 # décorateur qui permet de connecter une fonction à un signal
 from django.dispatch import receiver
+from datetime import datetime, date
 
 
 # Liste des rôles utilisateur disponibles.
@@ -48,18 +49,26 @@ class Contrat(models.Model):
     price = models.IntegerField()
     payment_received = models.CharField(max_length=3, choices=PAYMENT_STATUS)
     is_signed = models.BooleanField(default=False, verbose_name="Signed")
+    contrat_author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='contrats_author')
+
 
 class Event(models.Model):
     contrat = models.ForeignKey(Contrat, related_name='events', on_delete=models.CASCADE)
-    support_contact = models.ForeignKey(User, related_name='events', on_delete=models.CASCADE)
+    support_contact = models.ForeignKey(User, related_name='events', on_delete=models.CASCADE, null=True, blank=True)
     start_date = models.DateField()
     end_date = models.DateField()
     attendees = models.IntegerField()
     notes = models.TextField(null=True, blank=True)
-    
+
+
 @receiver(post_save, sender=Event)
 def update_contract_status(sender, instance, **kwargs):
-    end_date = instance.end_date
+    
+    if isinstance(instance.end_date, date):
+        end_date = instance.end_date
+    else:
+        end_date = datetime.strptime(instance.end_date, '%Y-%m-%d').date()
+        
     today = timezone.now().date()
 
     if end_date < today:

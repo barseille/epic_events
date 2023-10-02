@@ -1,27 +1,11 @@
 import typer
-from EpicEvents.models import Client
+from EpicEvents.models import Client, Contrat, Event
 from django.core.exceptions import ObjectDoesNotExist
 from cli_commands.cli_auth import get_user_info, load_tokens
 from typer import Exit
 
-app = typer.Typer()
 
-# @app.command()
-# def list_clients():
-#     user_info = get_user_info()
-#     if user_info is None:
-#         typer.echo("Tu dois te connecter d'abord.")
-#         return
-    
-#     if user_info['role'] != 'COMMERCIAL':
-#         typer.echo("Accès refusé. Seuls les commerciaux peuvent lister des clients.")
-#         return
-#     try:
-#         clients = Client.objects.all()
-#         for client in clients:
-#             typer.echo(f"ID: {client.id}, Nom: {client.name}, Email: {client.email}")
-#     except Exception as e:
-#         typer.echo(f"Erreur : {e}")
+app = typer.Typer()
 
 @app.command()
 def list_clients():
@@ -131,6 +115,47 @@ def delete_client(client_id: int):
         raise Exit(code=1)
 
 
+@app.command()
+def add_event_commercial(contrat_id: int, start_date: str, end_date: str, attendees: int, notes: str = None):
+    user_info = get_user_info()
+    if user_info is None:
+        typer.echo("Tu dois te connecter d'abord.")
+        return
+
+    if user_info['role'] != 'COMMERCIAL':
+        typer.echo("Accès refusé. Seuls les membres du support peuvent ajouter des événements.")
+        return
+
+    try:
+        # Vérifier si le contrat existe et est signé
+        contrat = Contrat.objects.get(id=contrat_id)
+        if not contrat.is_signed:
+            typer.echo("Le contrat doit être signé avant de créer un événement.")
+            return
+        
+        # Vérifier si un événement existe déjà pour ce contrat
+        existing_event = Event.objects.filter(contrat_id=contrat_id).first()
+        if existing_event:
+            typer.echo("Un événement existe déjà pour ce contrat.")
+            return
+        
+        # Vérifier si le paiement a été reçu
+        if contrat.payment_received != 'OUI':
+            typer.echo("Le paiement doit être reçu avant de créer un événement.")
+            return
+
+        event = Event.objects.create(
+            contrat_id=contrat_id,
+            # support_contact_id=user_info['id'],
+            start_date=start_date,
+            end_date=end_date,
+            attendees=attendees,
+            notes=notes
+        )
+        typer.echo(f"Événement pour le contrat {contrat_id} ajouté avec succès.")
+    except Exception as e:
+        typer.echo(f"Erreur : {e}")
+        raise Exit(code=1)
 
 if __name__ == "__main__":
     app()

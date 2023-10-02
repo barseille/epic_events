@@ -99,7 +99,7 @@ class EventViewSet(viewsets.ModelViewSet):
         if self.action == 'list':
             self.permission_classes = [IsAuthenticated, IsSupport]
         elif self.action == 'create':
-            self.permission_classes = [IsAuthenticated, IsSupport]
+            self.permission_classes = [IsAuthenticated, IsCommercial]
         elif self.action in ['update', 'partial_update']:
             self.permission_classes = [IsAuthenticated, IsSupport]
         elif self.action == 'delete':
