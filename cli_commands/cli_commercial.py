@@ -146,7 +146,6 @@ def add_event_commercial(contrat_id: int, start_date: str, end_date: str, attend
 
         event = Event.objects.create(
             contrat_id=contrat_id,
-            # support_contact_id=user_info['id'],
             start_date=start_date,
             end_date=end_date,
             attendees=attendees,

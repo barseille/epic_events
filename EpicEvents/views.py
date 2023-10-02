@@ -59,6 +59,7 @@ class ClientViewSet(viewsets.ModelViewSet):
             self.permission_classes = [IsAuthenticated, IsCommercial]
         return [permission() for permission in self.permission_classes]
 
+
 class ContratViewSet(viewsets.ModelViewSet):
     """
     Un ViewSet pour gérer les opérations CRUD sur les objets 'Contrat'.
