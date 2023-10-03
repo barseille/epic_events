@@ -26,6 +26,7 @@ PAYMENT_STATUS = [
     ('NON', 'Non'),
 ]
 
+
 class User(AbstractUser):
     role = models.CharField(max_length=15, choices=USER_ROLES, null=False, blank=False)
     email = models.EmailField(unique=True, blank=False, null=False)
@@ -75,4 +76,3 @@ def update_contract_status(sender, instance, **kwargs):
         contrat = instance.contrat
         contrat.status = 'TERMINE'
         contrat.save()
-

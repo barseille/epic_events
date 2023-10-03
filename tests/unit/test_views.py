@@ -1,6 +1,6 @@
 import pytest
 from rest_framework.test import APIClient
-from EpicEvents.models import User, Client, Contrat, Event  
+from EpicEvents.models import User, Client, Contrat, Event
 from django.urls import reverse
 import datetime
 
@@ -8,6 +8,7 @@ import datetime
 @pytest.fixture
 def api_client():
     return APIClient()
+
 
 @pytest.mark.django_db
 def test_create_user(api_client, commercial_user):
@@ -19,6 +20,7 @@ def test_create_user(api_client, commercial_user):
         'role': 'COMMERCIAL'
     })
     assert response.status_code == 201
+
 
 @pytest.mark.django_db
 def test_create_client(api_client, commercial_user):
@@ -32,11 +34,12 @@ def test_create_client(api_client, commercial_user):
     })
     assert response.status_code == 201
 
+
 @pytest.mark.django_db
 def test_create_contrat(api_client, admin_user):
     api_client.force_authenticate(user=admin_user)
     client_obj = Client.objects.create(
-        name='Client Test', 
+        name='Client Test',
         email='client@gmail.com',
         commercial_contact=admin_user
     )
@@ -52,6 +55,7 @@ def test_create_contrat(api_client, admin_user):
     })
     print(response.data)
     assert response.status_code == 201
+
 
 @pytest.mark.django_db
 def test_create_event(api_client, commercial_user):
@@ -91,5 +95,3 @@ def test_create_event(api_client, commercial_user):
     assert event.end_date == datetime.date(2023, 10, 4)
     assert event.attendees == 10
     assert event.notes == 'Some notes'
-
-

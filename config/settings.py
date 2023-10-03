@@ -3,6 +3,8 @@ from dotenv import load_dotenv
 import os
 import sys
 from datetime import timedelta
+import sentry_sdk
+from sentry_sdk.integrations.django import DjangoIntegration
 
 
 sys.path.append('..')
@@ -92,8 +94,6 @@ USE_I18N = True
 
 USE_TZ = True
 
-
-
 STATIC_URL = "static/"
 
 
@@ -128,3 +128,11 @@ SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1000),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=2),
 }
+
+
+sentry_sdk.init(
+    dsn="TON_DSN_SENTRY",
+    integrations=[DjangoIntegration()],
+    traces_sample_rate=1.0,
+    send_default_pii=True
+)

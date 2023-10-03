@@ -1,6 +1,6 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
-from .models import Client, Contrat, Event ,User 
+from .models import Client, Contrat, Event, User
 from .serializers import ClientSerializer, ContratSerializer, EventSerializer, UserSerializer
 from .permissions import IsCommercial, IsAdministration, IsSupport
 from django.contrib.auth import get_user_model
@@ -10,7 +10,7 @@ from rest_framework.decorators import action
 
 
 class UserViewSet(viewsets.ModelViewSet):
-    """ 
+    """
     Créer un utilisateur avec le bon rôle
     """
     queryset = User.objects.all()
@@ -24,7 +24,7 @@ class UserViewSet(viewsets.ModelViewSet):
                 username=serializer.validated_data['username'],
                 email=serializer.validated_data['email'],
                 password=serializer.validated_data['password'],
-                role=serializer.validated_data['role'] 
+                role=serializer.validated_data['role']
             )
             return Response(UserSerializer(user).data, status=status.HTTP_201_CREATED)
         else:
@@ -34,12 +34,13 @@ class UserViewSet(viewsets.ModelViewSet):
     def me(self, request):
         user = request.user
         serializer = UserSerializer(user)
-        return Response(serializer.data)      
-    
+        return Response(serializer.data)
+
+
 class ClientViewSet(viewsets.ModelViewSet):
     """
     Un ViewSet pour gérer les opérations CRUD sur les objets 'Client'.
-    Les permissions sont définies pour permettre uniquement aux utilisateurs 
+    Les permissions sont définies pour permettre uniquement aux utilisateurs
     avec le rôle 'Commercial' d'accéder aux ressources.
     """
     queryset = Client.objects.all()
@@ -63,9 +64,9 @@ class ClientViewSet(viewsets.ModelViewSet):
 class ContratViewSet(viewsets.ModelViewSet):
     """
     Un ViewSet pour gérer les opérations CRUD sur les objets 'Contrat'.
-    Les permissions sont définies pour permettre uniquement aux utilisateurs avec le rôle 'Administration' d'accéder aux ressources.
+    Les permissions sont définies pour permettre uniquement aux utilisateurs avec
+    le rôle 'Administration' d'accéder aux ressources.
     """
-
     queryset = Contrat.objects.all()
     serializer_class = ContratSerializer
     
@@ -84,11 +85,11 @@ class ContratViewSet(viewsets.ModelViewSet):
         return [permission() for permission in self.permission_classes]
 
 
-
 class EventViewSet(viewsets.ModelViewSet):
     """
     Un ViewSet pour gérer les opérations CRUD sur les objets 'Event'.
-    Les permissions sont définies pour permettre uniquement aux utilisateurs avec le rôle 'Support' d'accéder aux ressources.
+    Les permissions sont définies pour permettre uniquement aux utilisateurs
+    avec le rôle 'Support' d'accéder aux ressources.
     """
     queryset = Event.objects.all()
     serializer_class = EventSerializer
@@ -106,8 +107,7 @@ class EventViewSet(viewsets.ModelViewSet):
         elif self.action == 'delete':
             self.permission_classes = [IsAuthenticated, IsSupport]
         return [permission() for permission in self.permission_classes]
-
-    
+   
     def create(self, request, *args, **kwargs):
         # Récupérer l'ID du contrat depuis les données de la requête
         contrat_id = request.data.get('contrat')
@@ -123,15 +123,16 @@ class EventViewSet(viewsets.ModelViewSet):
             
             # Vérifier si le contrat est signé
             if not contrat.is_signed:
-                return Response({"error": "Le contrat doit être signé avant de créer un événement."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Le contrat doit être signé avant de créer un événement."},
+                                status=status.HTTP_400_BAD_REQUEST)
             
             # Nouvelle condition : Vérifier si le paiement a été reçu
             if contrat.payment_received != 'OUI':
-                return Response({"error": "Le paiement doit être reçu avant de créer un événement."}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({"error": "Le paiement doit être reçu avant de créer un événement."},
+                                status=status.HTTP_400_BAD_REQUEST)
                 
         except Contrat.DoesNotExist:
             return Response({"error": "Contrat non trouvé."}, status=status.HTTP_400_BAD_REQUEST)
 
         # Si tout est bon, procéder à la création de l'événement
         return super(EventViewSet, self).create(request, *args, **kwargs)
-

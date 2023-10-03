@@ -71,7 +71,7 @@ def test_create_contrat():
     assert contrat.end_date == "2023-12-31"
     assert contrat.price == 1000
     assert contrat.payment_received == "OUI"
-    assert contrat.is_signed == True
+    assert contrat.is_signed is True
     
     
 @pytest.mark.django_db
@@ -81,16 +81,16 @@ def test_create_event():
     """
     # Arrange
     commercial_user = User.objects.create(username="commercial", role="COMMERCIAL", email="commercial@example.com")
-    client = Client.objects.create(name="client", email="client@example.com", commercial_contact=commercial_user)  
+    client = Client.objects.create(name="client", email="client@example.com", commercial_contact=commercial_user)
     contrat = Contrat.objects.create(
-        client=client,  
+        client=client,
         status="EN_COURS",
         start_date="2023-01-01",
         end_date="2023-12-31",
         price=1000,
         payment_received="OUI",
         is_signed=True,
-        contrat_author=commercial_user 
+        contrat_author=commercial_user
     )
     start_date = "2023-10-03"
     end_date = "2023-10-04"

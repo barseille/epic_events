@@ -2,6 +2,7 @@ import pytest
 from EpicEvents.serializers import UserSerializer
 from EpicEvents.models import User
 
+
 @pytest.mark.django_db
 def test_valid_user_serializer():
     # Arrange
@@ -14,6 +15,7 @@ def test_valid_user_serializer():
     # Assert
     assert serialized_data['username'] == 'test_user'
     assert serialized_data['role'] == 'COMMERCIAL'
+
 
 @pytest.mark.django_db
 def test_invalid_user_serializer_missing_role():
