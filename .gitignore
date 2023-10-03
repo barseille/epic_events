@@ -1,7 +1,7 @@
 .env
 cli_commands/.cli_config.json
 cacert.pem
-flake8_rapport
-flake8_rapport/back.svg
-flake8_rapport/file.svg
+# flake8_rapport
+# flake8_rapport/back.svg
+# flake8_rapport/file.svg
 

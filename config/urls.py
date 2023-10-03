@@ -16,4 +16,5 @@ urlpatterns = [
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
     path('api/users/me/', views.UserViewSet.as_view({'get': 'me'}), name='user-me'),
     path('api/', include(router.urls)),
+    # path('sentry-test/', views.sentry_test, name='sentry_test'),
 ]

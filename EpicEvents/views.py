@@ -7,6 +7,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from django.http import HttpResponse
 
 
 class UserViewSet(viewsets.ModelViewSet):
@@ -136,3 +137,9 @@ class EventViewSet(viewsets.ModelViewSet):
 
         # Si tout est bon, procéder à la création de l'événement
         return super(EventViewSet, self).create(request, *args, **kwargs)
+    
+
+# def sentry_test(request):
+#     # Ceci va causer une erreur de division par zéro
+#     division_by_zero = 1 / 0
+#     return HttpResponse("Ceci est un test pour Sentry.")
