@@ -4,4 +4,5 @@ cacert.pem
 # flake8_rapport
 # flake8_rapport/back.svg
 # flake8_rapport/file.svg
+.venv
 
